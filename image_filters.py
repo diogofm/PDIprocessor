@@ -1,5 +1,6 @@
 import imageio
 import numpy as np
+import matplotlib.pyplot as plt
 from math import *
 
 
@@ -56,3 +57,23 @@ def bit_layers(im_name, im):
     imageio.imwrite('post_processed_images/bitlayer5_' + im_name, layer_5_im)
     imageio.imwrite('post_processed_images/bitlayer6_' + im_name, layer_6_im)
     imageio.imwrite('post_processed_images/bitlayer7_' + im_name, layer_7_im)
+
+
+def piecewise_linear(im_name, im, x_0_1, y_0_1, x_1_1, y_1_1, x_0_2, y_0_2, x_1_2, y_1_2, x_0_3, y_0_3, x_1_3, y_1_3):
+    x = np.array(range(0, 256), dtype=np.uint8)
+
+    line_x = np.array([x_0_1, x_1_1, x_0_2, x_1_2, x_0_3, x_1_3])
+    line_y = np.array([y_0_1, y_1_1, y_0_2, y_1_2, y_0_3, y_1_3])
+
+    yinterp = np.interp(x, line_x, line_y)
+
+    plt.plot(line_x, line_y, 'bo')
+    plt.plot(x, yinterp, 'g-')
+
+    for i in range(im.shape[0]):
+        for j in range(im.shape[1]):
+            im[i][j] = np.uint8(yinterp[im[i][j]])
+
+    imageio.imwrite('post_processed_images/piecewise_' + im_name, im)
+
+    plt.show()
