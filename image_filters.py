@@ -8,6 +8,7 @@ def image_histogram(im_name, im):
     data = im.copy().flatten()
     plt.hist(data, 256)
     plt.savefig('histograms/histogram_' + im_name)
+    plt.close()
 
 
 def normalized_histogram(im):
@@ -107,13 +108,8 @@ def piecewise_linear(im_name, im, x_0_1, y_0_1, x_1_1, y_1_1, x_0_2, y_0_2, x_1_
 
     yinterp = np.interp(x, line_x, line_y)
 
-    plt.plot(line_x, line_y, 'bo')
-    plt.plot(x, yinterp, 'g-')
-
     for i in range(im.shape[0]):
         for j in range(im.shape[1]):
             im[i][j] = np.uint8(yinterp[im[i][j]])
 
     imageio.imwrite('post_processed_images/piecewise_' + im_name, im)
-
-    plt.show()
