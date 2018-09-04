@@ -29,7 +29,7 @@ def histogram_equalization(im_name, im):
         for j in range(im.shape[1]):
             equalized_im[i][j] = transfer_function_values[im[i][j]]
 
-    imageio.imwrite('post_processed_images/eq_' + im_name, im)
+    imageio.imwrite('post_processed_images/eq_' + im_name, equalized_im)
     image_histogram('eq_' + im_name, equalized_im)
 
 
@@ -42,7 +42,7 @@ def negative(im_name, im):
     image_histogram('negative_' + im_name, im)
 
 
-def logarithmic(im_name, im):
+def logarithmic(im_name, im, c=(255/log(256))):
     for i in range(im.shape[0]):
         for j in range(im.shape[1]):
             log_byte = (255/log(256)) * log(1 + im[i][j])
