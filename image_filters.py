@@ -112,4 +112,332 @@ def piecewise_linear(im_name, im, x_0_1, y_0_1, x_1_1, y_1_1, x_0_2, y_0_2, x_1_
         for j in range(im.shape[1]):
             im[i][j] = np.uint8(yinterp[im[i][j]])
 
+    image_histogram('piecewise_' + im_name, im)
     imageio.imwrite('post_processed_images/piecewise_' + im_name, im)
+
+
+def averaging(im_name, image):
+    width = image.shape[1]
+    height = image.shape[0]
+    result = np.zeros((image.shape[0], image.shape[1]), np.uint8)
+
+    for row in range(height):
+        for col in range(width):
+            currentElement = 0
+            left = 0
+            right = 0
+            top = 0
+            bottom = 0
+            topLeft = 0
+            topRight = 0
+            bottomLeft = 0
+            bottomRight = 0
+            counter = 1
+            currentElement = image[row][col]
+
+            if not col - 1 < 0:
+                left = image[row][col - 1]
+                counter += 1
+            if not col + 1 > width - 1:
+                right = image[row][col + 1]
+                counter += 1
+            if not row - 1 < 0:
+                top = image[row - 1][col]
+                counter += 1
+            if not row + 1 > height - 1:
+                bottom = image[row + 1][col]
+                counter += 1
+
+            if not row - 1 < 0 and not col - 1 < 0:
+                topLeft = image[row - 1][col - 1]
+                counter += 1
+            if not row - 1 < 0 and not col + 1 > width - 1:
+                topRight = image[row - 1][col + 1]
+                counter += 1
+            if not row + 1 > height - 1 and not col - 1 < 0:
+                bottomLeft = image[row + 1][col - 1]
+                counter += 1
+            if not row + 1 > height - 1 and not col + 1 > width - 1:
+                bottomRight = image[row + 1][col + 1]
+                counter += 1
+
+            total = int(currentElement) + int(left) + int(right) + int(top) + int(bottom) + int(topLeft) + int(
+                topRight) + int(bottomLeft) + int(bottomRight)
+            avg = total / counter
+            result[row][col] = avg
+
+    image_histogram('averaging_' + im_name, result)
+    imageio.imwrite('post_processed_images/averaging_' + im_name, result)
+
+
+def weighted_averaging(im_name, image, filter_matrix):
+    width = image.shape[1]
+    height = image.shape[0]
+    result = np.zeros((image.shape[0], image.shape[1]), np.uint8)
+
+    for row in range(height):
+        for col in range(width):
+            currentElement = 0
+            left = 0
+            right = 0
+            top = 0
+            bottom = 0
+            topLeft = 0
+            topRight = 0
+            bottomLeft = 0
+            bottomRight = 0
+            counter = 0
+            currentElement = image[row][col]
+
+            if not col - 1 < 0:
+                left = image[row][col - 1]
+                counter += filter_matrix[1][0]
+            if not col + 1 > width - 1:
+                right = image[row][col + 1]
+                counter += filter_matrix[1][2]
+            if not row - 1 < 0:
+                top = image[row - 1][col]
+                counter += filter_matrix[0][1]
+            if not row + 1 > height - 1:
+                bottom = image[row + 1][col]
+                counter += filter_matrix[2][1]
+
+            if not row - 1 < 0 and not col - 1 < 0:
+                topLeft = image[row - 1][col - 1]
+                counter += filter_matrix[0][0]
+            if not row - 1 < 0 and not col + 1 > width - 1:
+                topRight = image[row - 1][col + 1]
+                counter += filter_matrix[0][2]
+            if not row + 1 > height - 1 and not col - 1 < 0:
+                bottomLeft = image[row + 1][col - 1]
+                counter += filter_matrix[2][0]
+            if not row + 1 > height - 1 and not col + 1 > width - 1:
+                bottomRight = image[row + 1][col + 1]
+                counter += filter_matrix[2][2]
+
+            total = int(currentElement) * filter_matrix[1][1] + \
+                    int(left) * filter_matrix[1][0] + \
+                    int(right) * filter_matrix[1][2] + \
+                    int(top) * filter_matrix[0][1] + \
+                    int(bottom) * filter_matrix[2][1] + \
+                    int(topLeft) * filter_matrix[0][0] + \
+                    int(topRight) * filter_matrix[0][2] + \
+                    int(bottomLeft) * filter_matrix[2][0] + \
+                    int(bottomRight) * filter_matrix[2][2]
+            avg = total / counter
+            result[row][col] = avg
+
+    image_histogram('weighted_averaging_' + im_name, result)
+    imageio.imwrite('post_processed_images/weighted_averaging_' + im_name, result)
+
+
+def median_filter(im_name, image):
+    width = image.shape[1]
+    height = image.shape[0]
+    result = np.zeros((image.shape[0], image.shape[1]), np.uint8)
+
+    for row in range(height):
+        for col in range(width):
+            currentElement = 0
+            left = 0
+            right = 0
+            top = 0
+            bottom = 0
+            topLeft = 0
+            topRight = 0
+            bottomLeft = 0
+            bottomRight = 0
+            counter = 1
+            currentElement = image[row][col]
+
+            if not col - 1 < 0:
+                left = image[row][col - 1]
+            if not col + 1 > width - 1:
+                right = image[row][col + 1]
+            if not row - 1 < 0:
+                top = image[row - 1][col]
+            if not row + 1 > height - 1:
+                bottom = image[row + 1][col]
+
+            if not row - 1 < 0 and not col - 1 < 0:
+                topLeft = image[row - 1][col - 1]
+            if not row - 1 < 0 and not col + 1 > width - 1:
+                topRight = image[row - 1][col + 1]
+            if not row + 1 > height - 1 and not col - 1 < 0:
+                bottomLeft = image[row + 1][col - 1]
+            if not row + 1 > height - 1 and not col + 1 > width - 1:
+                bottomRight = image[row + 1][col + 1]
+
+            neighbors = [int(currentElement), int(left), int(right), int(top), int(bottom), int(topLeft),
+                         int(topRight), int(bottomLeft), int(bottomRight)]
+            neighbors.sort()
+            result[row][col] = neighbors[5]
+
+    image_histogram('median_' + im_name, result)
+    imageio.imwrite('post_processed_images/median_' + im_name, result)
+
+
+def convolution(im_name, image, filter_matrix):
+    width = image.shape[1]
+    height = image.shape[0]
+    result = np.zeros((image.shape[0], image.shape[1]), np.uint8)
+
+    for row in range(height):
+        for col in range(width):
+            currentElement = 0
+            left = 0
+            right = 0
+            top = 0
+            bottom = 0
+            topLeft = 0
+            topRight = 0
+            bottomLeft = 0
+            bottomRight = 0
+            currentElement = image[row][col]
+
+            if not col - 1 < 0:
+                left = image[row][col - 1]
+            if not col + 1 > width - 1:
+                right = image[row][col + 1]
+            if not row - 1 < 0:
+                top = image[row - 1][col]
+            if not row + 1 > height - 1:
+                bottom = image[row + 1][col]
+
+            if not row - 1 < 0 and not col - 1 < 0:
+                topLeft = image[row - 1][col - 1]
+            if not row - 1 < 0 and not col + 1 > width - 1:
+                topRight = image[row - 1][col + 1]
+            if not row + 1 > height - 1 and not col - 1 < 0:
+                bottomLeft = image[row + 1][col - 1]
+            if not row + 1 > height - 1 and not col + 1 > width - 1:
+                bottomRight = image[row + 1][col + 1]
+
+            total = int(currentElement) * filter_matrix[1][1] + \
+                    int(left) * filter_matrix[1][0] + \
+                    int(right) * filter_matrix[1][2] + \
+                    int(top) * filter_matrix[0][1] + \
+                    int(bottom) * filter_matrix[2][1] + \
+                    int(topLeft) * filter_matrix[0][0] + \
+                    int(topRight) * filter_matrix[0][2] + \
+                    int(bottomLeft) * filter_matrix[2][0] + \
+                    int(bottomRight) * filter_matrix[2][2]
+            result[row][col] = total
+
+    image_histogram('conv_' + im_name, result)
+    imageio.imwrite('post_processed_images/conv_' + im_name, result)
+
+
+def laplacian(im_name, image):
+    width = image.shape[1]
+    height = image.shape[0]
+    result = np.zeros((image.shape[0], image.shape[1]), np.uint8)
+
+    for row in range(height):
+        for col in range(width):
+            currentElement = 0
+            left = 0
+            right = 0
+            top = 0
+            bottom = 0
+            topLeft = 0
+            topRight = 0
+            bottomLeft = 0
+            bottomRight = 0
+            currentElement = image[row][col]
+
+            if not col - 1 < 0:
+                left = image[row][col - 1]
+            if not col + 1 > width - 1:
+                right = image[row][col + 1]
+            if not row - 1 < 0:
+                top = image[row - 1][col]
+            if not row + 1 > height - 1:
+                bottom = image[row + 1][col]
+
+            if not row - 1 < 0 and not col - 1 < 0:
+                topLeft = image[row - 1][col - 1]
+            if not row - 1 < 0 and not col + 1 > width - 1:
+                topRight = image[row - 1][col + 1]
+            if not row + 1 > height - 1 and not col - 1 < 0:
+                bottomLeft = image[row + 1][col - 1]
+            if not row + 1 > height - 1 and not col + 1 > width - 1:
+                bottomRight = image[row + 1][col + 1]
+
+            total = int(currentElement) * 8 + \
+                    int(left) * (-1) + \
+                    int(right) * (-1) + \
+                    int(top) * (-1) + \
+                    int(bottom) * (-1) + \
+                    int(topLeft) * (-1) + \
+                    int(topRight) * (-1) + \
+                    int(bottomLeft) * (-1) + \
+                    int(bottomRight) * (-1)
+            result[row][col] = total
+
+    image_histogram('laplacian_' + im_name, result)
+    imageio.imwrite('post_processed_images/laplacian_' + im_name, result)
+
+
+def sobel(im_name, image):
+    width = image.shape[1]
+    height = image.shape[0]
+    result = np.zeros((image.shape[0], image.shape[1]), np.uint8)
+
+    for row in range(height):
+        for col in range(width):
+            currentElement = 0
+            left = 0
+            right = 0
+            top = 0
+            bottom = 0
+            topLeft = 0
+            topRight = 0
+            bottomLeft = 0
+            bottomRight = 0
+            currentElement = image[row][col]
+
+            if not col - 1 < 0:
+                left = image[row][col - 1]
+            if not col + 1 > width - 1:
+                right = image[row][col + 1]
+            if not row - 1 < 0:
+                top = image[row - 1][col]
+            if not row + 1 > height - 1:
+                bottom = image[row + 1][col]
+
+            if not row - 1 < 0 and not col - 1 < 0:
+                topLeft = image[row - 1][col - 1]
+            if not row - 1 < 0 and not col + 1 > width - 1:
+                topRight = image[row - 1][col + 1]
+            if not row + 1 > height - 1 and not col - 1 < 0:
+                bottomLeft = image[row + 1][col - 1]
+            if not row + 1 > height - 1 and not col + 1 > width - 1:
+                bottomRight = image[row + 1][col + 1]
+
+            total_x = int(currentElement) * 0 + \
+                    int(left) * 0 + \
+                    int(right) * 0 + \
+                    int(top) * (-2) + \
+                    int(bottom) * 2 + \
+                    int(topLeft) * (-1) + \
+                    int(topRight) * (-1) + \
+                    int(bottomLeft) * 1 + \
+                    int(bottomRight) * 1
+
+            total_y = int(currentElement) * 0 + \
+                    int(left) * (-1) + \
+                    int(right) * 1 + \
+                    int(top) * 0 + \
+                    int(bottom) * 0 + \
+                    int(topLeft) * (-1) + \
+                    int(topRight) * 1 + \
+                    int(bottomLeft) * (-1) + \
+                    int(bottomRight) * 1
+
+            total = np.sqrt((total_x * total_x) + (total_y * total_y))
+
+            result[row][col] = total
+
+    image_histogram('sobel_' + im_name, result)
+    imageio.imwrite('post_processed_images/sobel_' + im_name, result)
