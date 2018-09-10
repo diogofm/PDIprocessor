@@ -170,6 +170,62 @@ def averaging(im_name, image):
     imageio.imwrite('post_processed_images/averaging_' + im_name, result)
 
 
+def aver_return(im_name, image):
+    width = image.shape[1]
+    height = image.shape[0]
+    result = np.zeros((image.shape[0], image.shape[1]), np.uint8)
+
+    for row in range(height):
+        for col in range(width):
+            currentElement = 0
+            left = 0
+            right = 0
+            top = 0
+            bottom = 0
+            topLeft = 0
+            topRight = 0
+            bottomLeft = 0
+            bottomRight = 0
+            counter = 1
+            currentElement = image[row][col]
+
+            if not col - 1 < 0:
+                left = image[row][col - 1]
+                counter += 1
+            if not col + 1 > width - 1:
+                right = image[row][col + 1]
+                counter += 1
+            if not row - 1 < 0:
+                top = image[row - 1][col]
+                counter += 1
+            if not row + 1 > height - 1:
+                bottom = image[row + 1][col]
+                counter += 1
+
+            if not row - 1 < 0 and not col - 1 < 0:
+                topLeft = image[row - 1][col - 1]
+                counter += 1
+            if not row - 1 < 0 and not col + 1 > width - 1:
+                topRight = image[row - 1][col + 1]
+                counter += 1
+            if not row + 1 > height - 1 and not col - 1 < 0:
+                bottomLeft = image[row + 1][col - 1]
+                counter += 1
+            if not row + 1 > height - 1 and not col + 1 > width - 1:
+                bottomRight = image[row + 1][col + 1]
+                counter += 1
+
+            total = int(currentElement) + int(left) + int(right) + int(top) + int(bottom) + int(topLeft) + int(
+                topRight) + int(bottomLeft) + int(bottomRight)
+            avg = total / counter
+            result[row][col] = avg
+
+    image_histogram('averaging_' + im_name, result)
+    imageio.imwrite('post_processed_images/averaging_' + im_name, result)
+
+    return result
+
+
 def weighted_averaging(im_name, image, filter_matrix):
     width = image.shape[1]
     height = image.shape[0]
@@ -328,6 +384,23 @@ def convolution(im_name, image, filter_matrix):
     imageio.imwrite('post_processed_images/conv_' + im_name, result)
 
 
+def conv_return(im_name, image, kernel):
+    kernel = np.flipud(np.fliplr(kernel))    # Flip the kernel
+    output = np.zeros_like(image)            # convolution output
+    # Add zero padding to the input image
+    image_padded = np.zeros((image.shape[0] + 2, image.shape[1] + 2))
+    image_padded[1:-1, 1:-1] = image
+    for x in range(image.shape[1]):     # Loop over every pixel of the image
+        for y in range(image.shape[0]):
+            # element-wise multiplication of the kernel and the image
+            output[y,x]=(kernel*image_padded[y:y+3,x:x+3]).sum()
+
+    image_histogram('conv_' + im_name, output)
+    imageio.imwrite('post_processed_images/conv_' + im_name, output)
+
+    return output
+
+
 def laplacian(im_name, image):
     width = image.shape[1]
     height = image.shape[0]
@@ -441,3 +514,18 @@ def sobel(im_name, image):
 
     image_histogram('sobel_' + im_name, result)
     imageio.imwrite('post_processed_images/sobel_' + im_name, result)
+
+
+def highboost(im_name, image, c):
+    width = image.shape[1]
+    height = image.shape[0]
+    result = np.zeros((image.shape[0], image.shape[1]), np.uint8)
+
+    blurred_image = aver_return(im_name, image)
+
+    mask = image - blurred_image
+
+    result = image + (c * mask)
+
+    image_histogram('highboost' + im_name, result)
+    imageio.imwrite('post_processed_images/highboost_' + im_name, result)
