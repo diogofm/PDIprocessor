@@ -50,15 +50,26 @@ def run_day_two(kernel_weighted, kernel_conv, boost_constant):
         highboost(image_file_name, im.copy(), boost_constant)
         print("Highboost filter for " + image_file_name + " done.")
 
+def run_day_three():
+    images_path_list = os.listdir('./images/')
+
+    for image_file_name in images_path_list:
+        im = imageio.imread('images/' + image_file_name)
+        fourier(image_file_name, im)
+        print("Fourier Transform for " + image_file_name + " done.")
+
 
 if __name__ == '__main__':
+
+    run_day_three()
+
     # run_day_one(0.4, (255/log(256)), 0, 0, 10, 10, 11, 11, 13, 100, 14, 101, 255, 255)
 
-    weighted_kernel = np.array([[1, 5, 1], [5, 1, 5], [1, 5, 1]])
-    conv_kernel = np.array([[0, 5, 0], [0, 5, 0], [0, 5, 0]])
-    highboost_constant = 2
-
-    run_day_two(weighted_kernel, conv_kernel, highboost_constant)
+    # weighted_kernel = np.array([[1, 5, 1], [5, 1, 5], [1, 5, 1]])
+    # conv_kernel = np.array([[0, 5, 0], [0, 5, 0], [0, 5, 0]])
+    # highboost_constant = 2
+    #
+    # run_day_two(weighted_kernel, conv_kernel, highboost_constant)
 
     # run(sys.argv[1],
     #     sys.argv[2], sys.argv[3], sys.argv[4], sys.argv[5],

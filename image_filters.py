@@ -529,3 +529,16 @@ def highboost(im_name, image, c):
 
     image_histogram('highboost' + im_name, result)
     imageio.imwrite('post_processed_images/highboost_' + im_name, result)
+
+def fourier (im_name, image):
+    width = image.shape[1]
+    height = image.shape[0]
+
+    #result = np.zeros(height, width, np.uint8)
+    padded_image = np.zeros((height*2, width*2), np.uint8)
+
+    for i in range(height):
+        for j in range(width):
+            padded_image[i][j] = image[i][j] * pow(-1, i+j)
+
+    imageio.imwrite('post_processed_images/fourier_' + im_name, padded_image)
