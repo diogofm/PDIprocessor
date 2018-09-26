@@ -539,6 +539,10 @@ def fourier (im_name, image):
 
     for i in range(height):
         for j in range(width):
-            padded_image[i][j] = image[i][j] * pow(-1, i+j)
+            i2 = (height/2) + i
+            j2 = (width/2) + j
+            #print(i2, j2)
+            image[i][j] = image[i][j] * pow(-1, i+j)
+            padded_image[int(i2)][int(j2)] = image[i][j]
 
     imageio.imwrite('post_processed_images/fourier_' + im_name, padded_image)
